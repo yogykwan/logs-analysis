@@ -12,33 +12,6 @@ vagrant ssh
 cd /vagrant
 ```
 
-## Synopsis
-1. use postgresql as db and load from newsdata.sql
-2. `pip install psycopg2-binary` to use [psycopy2](http://initd.org/psycopg/docs/install.html#binary-install-from-pypi)
-3. execute specific sql clauses based on sys.argv
-4. `psql -d news` then create views
-```
-create view article_log_view as
-select title, count(log.id) as views
-from articles, log
-where articles.slug = substring(log.path from 10)
-group by title;
-create view author_log_view as
-select author, count(log.id) as views
-from articles, log
-where articles.slug = substring(log.path from 10)
-group by author;
-create view day_total_view as
-select to_char(time, 'YYYY-MM-DD') as day, count(log.id) as total
-from log
-group by day;
-create view day_error_view as
-select to_char(time, 'YYYY-MM-DD') as day, count(log.id) as error
-from log
-where status != '200 OK'
-group by day;
-```
-
 ## Usage
 ```
 python run.py [<args>]
@@ -55,4 +28,46 @@ args:
 e.g.
 ```
 python run.py author article error
+```
+
+## Synopsis
+1. use postgresql as db and load from newsdata.sql
+2. `pip install psycopg2-binary` to use [psycopy2](http://initd.org/psycopg/docs/install.html#binary-install-from-pypi)
+3. execute specific sql clauses based on sys.argv
+4. `psql -d news` then create postgresql views
+
+## Views
+1. article_log_view
+```
+CREATE OR REPLACE VIEW article_log_view AS
+SELECT title, COUNT(log.id) AS views
+FROM articles, log
+WHERE articles.slug = SUBSTRING(log.path FROM 10)
+GROUP BY title;
+```
+
+2. author_log_view
+```
+CREATE OR REPLACE VIEW author_log_view AS
+SELECT author, COUNT(log.id) AS views
+FROM articles, log
+WHERE articles.slug = SUBSTRING(log.path FROM 10)
+GROUP BY author;
+```
+
+3. day_total_view
+```
+CREATE OR REPLACE VIEW day_total_view AS
+SELECT TO_CHAR(time, 'YYYY-MM-DD') AS day, COUNT(log.id) AS total
+FROM log
+GROUP BY day;
+```
+
+4. day_error_view
+```
+CREATE OR REPLACE VIEW day_error_view AS
+SELECT TO_CHAR(time, 'YYYY-MM-DD') AS day, COUNT(log.id) AS error
+FROM log
+WHERE status != '200 OK'
+GROUP BY day;
 ```

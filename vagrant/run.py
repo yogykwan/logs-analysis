@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import psycopg2
 
@@ -13,9 +14,9 @@ def execute(clause):
 
 def get_top3_articles():
     res = execute("""
-        select * from article_log_view
-        order by views desc
-        limit 3;
+        SELECT * FROM article_log_view
+        ORDER BY views DESC
+        LIMIT 3;
         """)
     print "\n\nTop 3 articles with most views:"
     print '%-35s %9s' % ('article', 'views')
@@ -24,9 +25,9 @@ def get_top3_articles():
 
 def get_sorted_authors():
     res = execute("""
-        select name, views from author_log_view, authors
-        where author_log_view.author = authors.id
-        order by views desc;
+        SELECT name, views FROM author_log_view, authors
+        WHERE author_log_view.author = authors.id
+        ORDER BY views desc;
         """)
     print "\n\nAuthors list sorted by views:"
     print '%-35s %9s' % ('author', 'views')
@@ -35,11 +36,11 @@ def get_sorted_authors():
 
 def get_error_days():
     res = execute("""
-        select day_total_view.day,
-        round(error::numeric/total::numeric, 2) as error_rate
-        from day_total_view, day_error_view
-        where (day_total_view.day = day_error_view.day)
-        and (error > total * 0.01);
+        SELECT day_total_view.day,
+        ROUND(error::numeric/total::numeric, 2) AS error_rate
+        FROM day_total_view, day_error_view
+        WHERE (day_total_view.day = day_error_view.day)
+        AND (error > total * 0.01);
         """)
     print "\n\nDays when more than 1% of requests led to errors:"
     print '%-35s %9s' % ('day', 'error rate')
